@@ -110,14 +110,13 @@ const invoke = curryN(3, (config, cmd, args) => {
                 .then(timeEntry => showTimeEntry(config, timeEntry))
                 .then(() => { 
                     if (args) {
-                        return;
+                        return args;
                     }
 
                     showPhrases(config);
 
                     return showPrompt(promptSchemas.custom, { name: chalk.blue('msg:'), required: false });
                 })
-                .then(always(args))
                 .then(rawPhrase => {
                     const phrase = getPhrase(config, rawPhrase);
 
@@ -236,7 +235,7 @@ const invoke = curryN(3, (config, cmd, args) => {
 
             break;
         default: 
-            showError(`${cmd} command is not found`);
+            showError(`${cmd} command not found`);
             program.help();
             terminate(1);
     }
