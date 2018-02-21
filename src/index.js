@@ -2,7 +2,6 @@
 
 const prompt = require('prompt');
 const chalk = require('chalk');
-const clear = require('clear');
 const { loadConfig, terminate } = require('./utils');
 const { program } = require('./env');
 const { invoke } = require('./commands');
