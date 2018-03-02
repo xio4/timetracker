@@ -14,15 +14,20 @@ const {
     map,
 } = require('ramda');
 const { 
+    createJiraLink,
     dateToRange,
     formatJiraTimeSpent,
     getDuration,
+    getImportConfig,
     getIssueIdFromDescription,
     getJiraConfig,
     getPhrase,
     getTogglConfig,
+    issueIdP,
     issueSummaryP,
     keyP,
+    promiseMapSequence,
+    setTimeInDate,
     showError,
     showInfo,
     showPhrases,
@@ -30,11 +35,7 @@ const {
     showTimeEntry,
     showWarning, 
     terminate,
-    toInt,
-    issueIdP,
-    getImportConfig,
-    createJiraLink,
-    setTimeInDate,
+    toInt
 } = require('./utils');
 const { program } = require('./env');
 const { 
@@ -175,11 +176,11 @@ const invoke = curryN(3, (config, cmd, args) => {
 
                     return createAllWorklogsMap(config, issueIds)
                         .then(allWorklogsMap => {
-                            durationMapList.map((durationMap, idx) => {
+                            const durationMapListMapper = (durationMap, idx) => {
                                 const date = dateRange[idx];
                                 const durationList = values(durationMap);
 
-                                durationList.map(({ issueId, shortDescription, description, duration }) => {
+                                const durationListMapper = ({ issueId, shortDescription, description, duration }) => {
                                     const jiraDuration = getDurationFromJiraWorklogs(
                                         config, 
                                         date, 
@@ -226,8 +227,12 @@ const invoke = curryN(3, (config, cmd, args) => {
                                         showInfo(`date: ${date.format(TIME_ENTRY_DATE_FORMAT)}`, 'magenta');
                                         showInfo('status: worklog in jira is too big', 'magenta');
                                     }
-                                });
-                            });
+                                };
+
+                                return promiseMapSequence(durationList, durationListMapper);
+                            };
+
+                            return promiseMapSequence(durationMapList, durationMapListMapper);
                         });
                     });
                 }

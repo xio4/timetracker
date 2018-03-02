@@ -210,6 +210,35 @@ const setTimeInDate = (date, time) => {
 
     return date.clone().startOf('days').add({ hours, minutes });
 };
+const promiseMapSequence = (list = [], fn = identity) => {
+    if (!list.length) {
+        return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+        const result = [];
+        const { length } = list;
+        const nextPromise = idx => payload => { 
+            if (idx > 0) {
+                result.push(payload);
+            }
+
+            if (idx >= list.length) {
+                resolve(result);
+
+                return;
+            }
+
+            const item = fn(list[idx], idx);
+
+            return Promise.resolve(item)
+                .then(nextPromise(idx + 1))
+                .catch(reject);
+        };
+
+        nextPromise(0)();
+    });
+};
 
 prompt.message = '';
 prompt.delimiter = '';
@@ -238,6 +267,7 @@ module.exports = {
     loadConfig,
     messageP,
     promptSchemas,
+    promiseMapSequence,
     readFile,
     reducePromise,
     removeSpaces,
