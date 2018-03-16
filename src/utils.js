@@ -1,20 +1,21 @@
 const fs = require('fs');
 const chalk = require('chalk');
 const { promisify } = require('util'); 
+const decode = require('unescape');
 const { 
     always, 
     compose, 
     curryN, 
     filter,
+    head,
     identity,
     keys, 
+    last,
     path, 
     pathEq, 
     pathOr, 
     reduce,
     replace,
-    head,
-    last,
     split,
 } = require('ramda');
 const prompt = require('prompt');
@@ -239,6 +240,7 @@ const promiseMapSequence = (list = [], fn = identity) => {
         nextPromise(0)();
     });
 };
+const unescapeText = compose(replace('\\',''), text => decode(text).toString());
 
 prompt.message = '';
 prompt.delimiter = '';
@@ -285,4 +287,5 @@ module.exports = {
     worklogsP,
     wrapObjProperties,
     writeFile,
+    unescapeText
 };

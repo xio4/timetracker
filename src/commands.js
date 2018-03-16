@@ -35,7 +35,8 @@ const {
     showTimeEntry,
     showWarning, 
     terminate,
-    toInt
+    toInt,
+    unescapeText
 } = require('./utils');
 const { program } = require('./env');
 const { 
@@ -71,7 +72,7 @@ const invoke = curryN(3, (config, cmd, args) => {
     const { defaultIssue } = getJiraConfig(config);
     const togglConfig = getTogglConfig(config);
     const importConfig = getImportConfig(config);
-    const togglDescriptionTemplate = Handlebars.compile(togglConfig.descriptionTemplate);
+    const togglDescriptionTemplate = compose(unescapeText, Handlebars.compile(togglConfig.descriptionTemplate));
 
     switch (cmd) {
         case cmds.START: 
